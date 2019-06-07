@@ -10,7 +10,7 @@ class Movie(models.Model):
     poster = models.ImageField(null=False)
     detail = models.TextField(max_length=150, null=False)
     trailer_url = models.URLField(null=False)
-    rating = models.FloatField(validators=[MinValueValidator(1), MaxValueValidator(10)])
+    rating = models.IntegerField(choices=list(zip(range(1, 11), range(1, 11))), null=False)
     genre = models.ForeignKey('Genre', null=True, blank=True, on_delete=models.CASCADE)
     original_language = models.ForeignKey('Language', null=True, blank=True, on_delete=models.CASCADE)
     country = models.ForeignKey('Country', null=True, blank=True, on_delete=models.CASCADE)
