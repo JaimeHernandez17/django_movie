@@ -23,6 +23,8 @@ SECRET_KEY = '7a)a%8w2$u@*n0i(m@ua*d9g1v8a9kuk8ma42vyuf8ve!rl!#n'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
+DEBUG = False
+
 ALLOWED_HOSTS = ['*']
 
 # Application definition
@@ -34,6 +36,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'debug_toolbar',
+    'rest_framework',
+
     'appMovie',
 ]
 
@@ -45,6 +51,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'django_movie.urls'
@@ -105,6 +112,14 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = os.path.join(BASE_DIR, 'static'),
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# AUTH_USER_MODEL = 'appMovie.AccountUser'
+LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+}
 
 try:
     exec(open(os.path.join(BASE_DIR, 'django_movie/local_settings.py')).read())

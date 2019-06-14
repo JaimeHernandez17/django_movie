@@ -280,9 +280,9 @@ header.navbar .navbar-inner {
 }
 
 header #logo {
-    width: 220px;
+    width: 300px;
     height: 80px;
-    background: url(../images/logo.png) no-repeat 0 50%
+    background: url(../images/logomovies.png) no-repeat 0 50%
 }
 
 header.navbar {
@@ -834,13 +834,13 @@ ul.gallery li .preview .overlay {
 }
 
 ul.gallery li .preview .links {
-    width: 104px;
+    width: 182px;
     height: 40px;
     position: absolute;
     top: 50%;
     left: 50%;
     margin-top: -20px;
-    margin-left: -52px;
+    margin-left: -76px;
     opacity: 0;
     filter: alpha(opacity=0);
     -webkit-transform: translate(0, -50px);

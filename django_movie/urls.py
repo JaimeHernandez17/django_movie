@@ -16,12 +16,21 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.views.static import serve
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', include('django.contrib.auth.urls')),
+    path('', include('appMovie.urls')),
 ]
+
+if settings.DEBUG:
+    import debug_toolbar
+
+    urlpatterns = [
+        path('__debug__/', include(debug_toolbar.urls)),
+    ] + urlpatterns
 
 if settings.DEBUG:
     urlpatterns += [
