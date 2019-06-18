@@ -29,13 +29,6 @@
                 <a id="logo" class="pull-left" href="{% url 'appMovie:index' %}"></a>
                 <div class="nav-collapse collapse pull-right">
                     <ul class="nav">
-                        {% if form.errors and not user.is_authenticated %}
-                            <li>
-                                <p style="color: red; font-weight: bold; font-size: large;">Your username and
-                                    password didn't match. Please try
-                                    again.</p>
-                            </li>
-                        {% endif %}
                         {% if user.is_authenticated and user.is_staff %}
                             <li>
                                 <a> Welcome, {{ user.get_username }}</a>
@@ -45,7 +38,7 @@
                                         class="icon-angle-down"></i></a>
                                 <ul class="dropdown-menu">
                                     <li><a class="in" href="{% url 'appMovie:addmovie' %}">Add movie</a></li>
-                                    <li><a href="#">List movies</a></li>
+                                    <li><a href="{% url 'appMovie:listmovies' %}">List movies</a></li>
                                 </ul>
                             </li>
                             <li>

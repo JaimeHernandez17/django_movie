@@ -90,6 +90,3 @@ class Command(BaseCommand):
 
         print(search)
         print(title)
-        print(ids)
-        print(movies[0]['Runtime'])
-        print(movies[0]['imdbRating'])

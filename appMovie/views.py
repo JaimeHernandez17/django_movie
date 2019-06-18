@@ -1,18 +1,28 @@
+import uuid
+
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
+from django.contrib.auth.views import SuccessURLAllowedHostsMixin, LoginView, LogoutView
 from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, resolve_url
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import never_cache
 from django.views.generic import DetailView, ListView, CreateView, UpdateView, DeleteView, FormView
 from rest_framework import serializers
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView, ListCreateAPIView, \
+    RetrieveUpdateDestroyAPIView
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework_xml.renderers import XMLRenderer
 
-from appMovie.api.serializers import MovieSerializer
+from appMovie.api.serializers import MovieSerializer, MovieRateSerializer, MovieModelSerializer
 
-from appMovie.forms import MovieForm, SimpleForm, MovieRateForm
-from appMovie.models import Movie, MovieRate
+from appMovie.forms import MovieForm, SimpleForm, MovieRateForm, TokenUserForm
+from appMovie.models import Movie, MovieRate, TokenUser
+
+from django.contrib.auth import logout as auth_logout
 
 
 def movieAdded(request):
@@ -46,9 +56,32 @@ class SerializerExampleList(ListView):
         return self.response_class(context.get('objects'), **response_kwargs)
 
 
-class SerializerExampleApiList(ListAPIView):
+##########################################################
+class SerializerExampleApiListView(ListAPIView):  ###list
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
+
+
+class SerializerExampleApiDetailUpdateDeleteView(RetrieveUpdateDestroyAPIView):  ###detail
+    queryset = Movie.objects.all()
+    serializer_class = MovieModelSerializer
+    lookup_field = 'slug'
+
+
+class SerializerExampleApiCreateListView(ListCreateAPIView):  ##crear y listar
+    queryset = Movie.objects.all()
+    serializer_class = MovieModelSerializer
+
+
+######################################################
+class MovieRateListView(ListAPIView):
+    queryset = MovieRate.objects.all()
+    serializer_class = MovieRateSerializer
+
+
+class MovieRateDetailView(RetrieveAPIView):
+    queryset = MovieRate.objects.all()
+    serializer_class = MovieRateSerializer
 
 
 class SerializerExampleDetail(DetailView):
@@ -66,11 +99,47 @@ class SerializerExampleDetail(DetailView):
         return self.response_class(context.get('objects'), **response_kwargs)
 
 
+#################################################################
+
+class LoginViewEdit(LoginView):
+    form_class_token = TokenUserForm
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        user = User.objects.get(username=request.POST.get('username'))
+        form_second = self.form_class_token()
+        if form.is_valid():
+            try:
+                TokenUser.objects.get(user=user)
+            except Exception:
+                data = form_second.save(commit=False)
+                data.user = user
+                data.save()
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+
+class LogoutViewEdit(LogoutView):
+    def dispatch(self, request, *args, **kwargs):
+        TokenUser.objects.get(user=request.user.pk).delete()
+        return super(LogoutViewEdit, self).dispatch(request, *args, **kwargs)
+
+
+class ListMoviesView(ListView):
+    template_name = 'listmovie.html'
+    queryset = Movie.objects.all()
+
+    def get_queryset(self):
+        qs = super(ListMoviesView, self).get_queryset()
+        return qs.order_by('-id')
+
+
 class HomeView(ListView):
     template_name = 'index.html'
     extra_context = {'title': 'My Internet movie database'}
     queryset = Movie.objects.all()
-    paginate_by = 4
+    paginate_by = 12
 
     def get_queryset(self):
         qs = super(HomeView, self).get_queryset()
@@ -139,7 +208,7 @@ class UpdateMovie(LoginRequiredMixin, UpdateView):
 class DeleteMovie(LoginRequiredMixin, DeleteView):
     model = Movie
     template_name = 'CRUD/deletemovie.html'
-    success_url = reverse_lazy('appMovie:moviedeleted')
+    success_url = reverse_lazy('appMovie:index')
 
 
 class MovieDetailView(DetailView):
@@ -155,7 +224,7 @@ class MovieDetailView(DetailView):
         return data
 
 
-class MovieRateCreate(CreateView):
+class MovieRateCreate(LoginRequiredMixin, CreateView):
     model = MovieRate
     form_class = MovieRateForm
     template_name = 'CRUD/addrate.html'

@@ -2,7 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.timezone import datetime
 
-from appMovie.models import MovieRate
+from appMovie.models import MovieRate, TokenUser
 from .models import Movie, Genre, Language, Country, MovieDirector, MovieActor
 
 
@@ -50,19 +50,26 @@ class MovieForm(forms.ModelForm):
 
 
 class MovieRateForm(forms.ModelForm):
-
     class Meta:
         model = MovieRate
 
         fields = {
-            'rate', 'movie'
+            'user', 'rate', 'movie'
         }
 
         labels = {
+            'user': 'User',
             'rate': 'Rate',
             'movie': 'Movie',
         }
 
+
+class TokenUserForm(forms.ModelForm):
+    class Meta:
+        model = TokenUser
+        fields = (
+            'user',
+        )
 
 
 class SimpleForm(forms.ModelForm):

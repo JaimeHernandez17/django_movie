@@ -1,3 +1,5 @@
+import uuid
+
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.conf import settings
@@ -77,3 +79,11 @@ class MovieDirector(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class TokenUser(models.Model):
+    token = models.UUIDField(default=uuid.uuid4)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
+
+    def __str__(self):
+        return self.token

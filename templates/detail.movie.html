@@ -67,16 +67,37 @@
 
                     </tbody>
                 </table>
+                <br>
+                <div class="center gap">
+                    <h1>Rate this movie</h1>
+                    {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'appMovie:addmovierate' %}">
+                            {% csrf_token %}
+                            <label for="id_user">User:</label>
+                            <select disabled name="user" id="id_user">
+                                {% for x, y in form.fields.user.choices %}
+                                    {% if y == user.username %}
+                                        <option value="{{ x }}" selected>{{ y }}</option>}
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
 
-                {% if user.is_authenticated %}
-                    <form method="post" action="{% url 'appMovie:addmovierate' %}">
-                        {% csrf_token %}
-                        {{ form.as_p }}
-                        <input class="btn btn-large btn-transparent"
-                                type="submit" value="Guardar"/>
+                            <label for="id_rate">Rate:</label>{{ form.rate }}<br>
+                            <label for="id_movie">Movie:</label>
+                            <select disabled name="movie" id="id_movie">
+                                {% for x, y in form.fields.movie.choices %}
+                                    {% if y == movie.title %}
+                                        <option value="{{ x }}" selected>{{ y }}</option>}
+                                    {% endif %}
+                                {% endfor %}
+                            </select><br><br>
 
-                    </form>
-                {% endif %}
+                            <input class="btn btn-large btn-transparent" type="submit" value="Guardar"/>
+
+                        </form>
+                    {% endif %}
+                </div>
+
 
             </div>
         </div>
