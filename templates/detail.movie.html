@@ -69,8 +69,8 @@
                 </table>
                 <br>
                 <div class="center gap">
+                {% if user.is_authenticated %}
                     <h1>Rate this movie</h1>
-                    {% if user.is_authenticated %}
                         <form method="post" action="{% url 'appMovie:addmovierate' %}">
                             {% csrf_token %}
                             <label for="id_user">User:</label>

@@ -202,7 +202,7 @@ class UpdateMovie(LoginRequiredMixin, UpdateView):
     model = Movie
     template_name = 'CRUD/editmovie.html'
     form_class = MovieForm
-    success_url = reverse_lazy('appMovie:movieedited')
+    success_url = reverse_lazy('appMovie:index')
 
 
 class DeleteMovie(LoginRequiredMixin, DeleteView):

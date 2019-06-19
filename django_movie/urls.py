@@ -23,6 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('django.contrib.auth.urls')),
     path('', include('appMovie.urls')),
+    path(f'api/{settings.API_VERSION}/', include('appMovie.api.urls'))
 ]
 
 if settings.DEBUG:

@@ -116,6 +116,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # AUTH_USER_MODEL = 'appMovie.AccountUser'
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/'
+API_VERSION = 'v1'
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
