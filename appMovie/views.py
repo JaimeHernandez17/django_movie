@@ -1,28 +1,20 @@
-import uuid
-
-from django.conf import settings
+import django_filters
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from django.contrib.auth.views import SuccessURLAllowedHostsMixin, LoginView, LogoutView
-from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import render, resolve_url
+from django.contrib.auth.views import LoginView, LogoutView
+from django.http import HttpResponse
+from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import never_cache
 from django.views.generic import DetailView, ListView, CreateView, UpdateView, DeleteView, FormView
-from rest_framework import serializers
-from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView, ListCreateAPIView, \
-    RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.renderers import JSONRenderer
-from rest_framework.parsers import JSONParser
-from rest_framework_xml.renderers import XMLRenderer
+from rest_framework.authtoken.models import Token
 
+from appMovie.api.filters import MovieFilterset
 from appMovie.api.serializers import MovieSerializer, MovieRateSerializer, MovieModelSerializer
 
 from appMovie.forms import MovieForm, SimpleForm, MovieRateForm, TokenUserForm
 from appMovie.models import Movie, MovieRate, TokenUser
-
-from django.contrib.auth import logout as auth_logout
 
 
 def movieAdded(request):
@@ -106,13 +98,17 @@ class LoginViewEdit(LoginView):
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
-        user = User.objects.get(username=request.POST.get('username'))
+        try:
+            user = User.objects.get(username=request.POST.get('username'))
+        except Exception:
+            return self.form_invalid(form)
         form_second = self.form_class_token()
         if form.is_valid():
             try:
                 TokenUser.objects.get(user=user)
             except Exception:
                 data = form_second.save(commit=False)
+                Token.objects.get_or_create(user=user, defaults={'user': user})
                 data.user = user
                 data.save()
             return self.form_valid(form)
@@ -121,18 +117,52 @@ class LoginViewEdit(LoginView):
 
 
 class LogoutViewEdit(LogoutView):
+
     def dispatch(self, request, *args, **kwargs):
         TokenUser.objects.get(user=request.user.pk).delete()
+        Token.objects.get(user=request.user.pk).delete()
         return super(LogoutViewEdit, self).dispatch(request, *args, **kwargs)
 
 
 class ListMoviesView(ListView):
+    template_name = 'listmovies.html'
+    queryset = Movie.objects.all()
+    paginate_by = 20
+
+
+class SearchMoviesView(ListView):
     template_name = 'listmovie.html'
     queryset = Movie.objects.all()
+    #filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    #filterset_class = MovieFilterset
+
+    def get(self, request, *args, **kwargs):
+        if self.request.GET.get('query') != None:
+            return self.searchMovie(request)
 
     def get_queryset(self):
-        qs = super(ListMoviesView, self).get_queryset()
+        qs = super(SearchMoviesView, self).get_queryset()
         return qs.order_by('-id')
+
+    # def searchMovie(self, request):
+    #     busqueda = self.request.GET.get('query')
+    #     busqueda = str(busqueda).lower()
+    #     num = 0
+    #     try:
+    #         num = int(busqueda)
+    #     except:
+    #         pass
+    #     try:
+    #         if busqueda == None or busqueda == "":
+    #             movie = None
+    #             contex = {'movies': movie}
+    #         elif Movie.objects.filter(title__icontains=busqueda):
+    #             movie = Movie.objects.filter(title__icontains=busqueda)
+    #             contex = {'movies': movie}
+    #         return render(request, 'listmovie.html', contex)
+    #     except Exception:
+    #         contex = {'movies': 'no se encontraron coincidencias'}
+    #         return render(request, 'listmovie.html', contex)
 
 
 class HomeView(ListView):
@@ -160,35 +190,6 @@ class HomeView(ListView):
             'best_rated_value': best_movie,
         })
         return data
-
-    def searchMovie(self, request):
-        busqueda = self.request.GET.get('q')
-        num = 0
-        try:
-            num = int(busqueda)
-        except:
-            pass
-        if busqueda == None or busqueda == "":
-            movie = Movie.objects.all()
-            contex = {'movies': movie}
-        elif Movie.objects.filter(title__icontains=busqueda):
-            movie = Movie.objects.filter(title__icontains=busqueda)
-            contex = {'movies': movie, }
-        elif Movie.objects.filter(genre__icontains=busqueda):
-            movie = Movie.objects.filter(genre__icontains=busqueda)
-            contex = {'movies': movie}
-        elif Movie.objects.filter(actors__name__icontains=busqueda):
-            movie = Movie.objects.filter(actors__name__icontains=busqueda)
-            contex = {'movies': movie}
-        elif Movie.objects.filter(directors__name__icontains=busqueda):
-            movie = Movie.objects.filter(directors__name__icontains=busqueda)
-            contex = {'movies': movie}
-        elif Movie.objects.filter(year=num):
-            movie = Movie.objects.filter(year=num)
-            contex = {'movies': movie}
-        else:
-            contex = {'movies': 'no se encontraron conicidencias'}
-        return render(request, 'movies.html', contex)
 
 
 class CreateMovie(LoginRequiredMixin, CreateView):

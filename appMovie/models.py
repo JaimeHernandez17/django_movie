@@ -14,6 +14,7 @@ class Movie(models.Model):
     duration = models.IntegerField()
     release_date = models.DateField()
     poster = models.ImageField()
+    # total_rate = models.FloatField()
     detail = models.TextField(max_length=300)
     trailer_url = models.URLField(default='', blank=True)
     genre = models.ForeignKey('Genre', null=True, blank=True, on_delete=models.SET_NULL)
@@ -54,12 +55,13 @@ class Country(models.Model):
 class MovieRate(models.Model):
     movie = models.ForeignKey(Movie, null=True, blank=True, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
-    rate = models.FloatField(validators=[MinValueValidator(0), MaxValueValidator(11)])
+    rate = models.FloatField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    comment = models.TextField(default='', max_length=300)
 
     objects = MovieRateQueryset.as_manager()
 
     class Meta:
-        unique_together = ['user', 'movie']
+        unique_together = ('user', 'movie')
 
     def __str__(self):
         return "{} - {}".format(self.user.username, self.movie.title)

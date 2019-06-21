@@ -1,10 +1,12 @@
 from django.contrib.auth.views import LoginView, logout_then_login
 from django.urls import path
+
+from appMovie.api.filters import MovieFilterset
 from appMovie.views import MovieDetailView, HomeView, CreateMovie, UpdateMovie, DeleteMovie, movieAdded, movieDeleted, \
-    movieEdited, movieRated, MovieRateCreate, SerializerExampleDetail, ListMoviesView, \
+    movieEdited, movieRated, MovieRateCreate, SerializerExampleDetail, \
     SerializerExampleApiListView, \
     SerializerExampleApiCreateListView, SerializerExampleApiDetailUpdateDeleteView, LoginViewEdit, \
-    LogoutViewEdit
+    LogoutViewEdit, SearchMoviesView, ListMoviesView
 
 app_name = 'appMovie'
 
@@ -19,7 +21,9 @@ urlpatterns = [
     path('deletemovie/<slug>/', DeleteMovie.as_view(template_name='CRUD/deletemovie.html'), name='deletemovie'),
     ###
     path('movies/<slug>/', MovieDetailView.as_view(), name='movie-detail'),
-    path('listmovies/', ListMoviesView.as_view(), name='listmovies'),
+    path('listmovies/', ListMoviesView.as_view(),
+         name='listmovies'),
+    path('searchmovies/', SearchMoviesView.as_view(), name='searchmovies'),
     path('detailapi/<slug>/', SerializerExampleDetail.as_view(), name='detailapi'),
     ###
     path('movie/', SerializerExampleApiCreateListView.as_view(), name='create-list-movie'),

@@ -59,19 +59,15 @@
                     </ul>
                 </div>
                 <div class="input-block-level">
-{#                    <form method="get">#}
-{#                        {% csrf_token %}#}
-{#                        <input type="search" class="form-control" placeholder="Search movie" id="query" name="query"#}
-{#                               aria-describedby="basic-addon2 " style="#}
-{#    margin-top: 14px;#}
-{#    margin-bottom: 0px;#}
-{#">#}
-{##}
-{#                        <button class="btn btn-large" type="submit" value="search" style="margin-left: 15px">#}
-{#                            Search#}
-{#                        </button>#}
-{##}
-{#                    </form>#}
+                    <form method="get" action="{% url 'appMovie:searchmovies' %}">
+                        {% csrf_token %}
+                        <input type="search" class="form-control" placeholder="Search movie" id="query" name="query"
+                               aria-describedby="basic-addon2 " style="margin-top: 14px; margin-bottom: 0px;">
+                        <button class="btn btn-large" type="submit" value="search" style="margin-left: 15px">
+                            Search
+                        </button>
+
+                    </form>
                 </div>
             </nav>
         </div>

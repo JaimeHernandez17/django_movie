@@ -38,7 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'debug_toolbar',
+
     'rest_framework',
+    'rest_framework.authtoken',
+    'django_filters',
 
     'appMovie',
 ]
@@ -52,7 +55,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
-    'appMovie.middleware.LoginMiddleware'
+    # 'appMovie.middleware.LoginMiddleware'
 ]
 
 ROOT_URLCONF = 'django_movie.urls'
@@ -119,8 +122,13 @@ LOGIN_URL = '/'
 API_VERSION = 'v1'
 
 REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 5,
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ],
 }
 
 try:

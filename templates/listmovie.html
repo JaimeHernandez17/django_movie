@@ -14,43 +14,64 @@
     <section id="services">
         <div class="container">
             <div class="center gap">
-                <table class="table-active" border="2">
-                    <thead class="boldJ">
-                    <td>Title</td>
-                    <td>Poster</td>
-                    <td>Genre</td>
-                    <td>Language</td>
-                    <td>Country</td>
-                    <td>Release date</td>
-                    <td>Duration</td>
-                    <td>Trailer url</td>
-                    <td>Directors</td>
-                    <td>Actors</td>
-                    </thead>
-                    <tbody>
-                    {% for movie in object_list %}
-                        <tr>
-                            <td>{{ movie.title }}</td>
-                            <td><img class="img" src="{{ movie.poster.url }}"></td>
-                            <td>{{ movie.genre }}</td>
-                            <td>{{ movie.original_language }}</td>
-                            <td>{{ movie.country }}</td>
-                            <td>{{ movie.release_date }}</td>
-                            <td>{{ movie.duration }} min</td>
-                            <td><a target="_blank" href="{{ movie.trailer_url }}">{{ movie.trailer_url }}</a></td>
-                            <td>{% for director in movie.directors|data %}
-                                * {{ director.name }}
-                            {% endfor %}</td>
-                            <td>{% for actor in movie.actors|data %}
-                                * {{ actor.name }}
-                            {% endfor %}</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                {% if movies == None %}
+                    <h1>Enter a movie title in the search bar</h1>
+                {% elif movies == 'no se encontraron coincidencias' %}
+                    <h1>No matches were found</h1>
+                {% else %}
+                    <table class="table-active" border="2">
+                        <thead class="boldJ">
+                        <td>Title</td>
+                        <td>Poster</td>
+                        <td>Genre</td>
+                        <td>Language</td>
+                        <td>Country</td>
+                        <td>Release date</td>
+                        <td>Duration</td>
+                        <td>Trailer url</td>
+                        <td>Directors</td>
+                        <td>Actors</td>
+                        {% if user.is_authenticated and user.is_staff %}
+                            <td>Admin options</td>
+                        {% endif %}
+                        </thead>
+                        <tbody>
+
+                        {% for movie in movies %}
+                            <tr>
+                                <td><a href="{% url 'appMovie:movie-detail' movie.slug %}">{{ movie.title }}</a></td>
+                                <td><a href="{% url 'appMovie:movie-detail' movie.slug %}"><img class="img"
+                                                                                                src="{{ movie.poster.url }}"></a>
+                                </td>
+                                <td>{{ movie.genre }}</td>
+                                <td>{{ movie.original_language }}</td>
+                                <td>{{ movie.country }}</td>
+                                <td>{{ movie.release_date }}</td>
+                                <td>{{ movie.duration }} min</td>
+                                <td><a target="_blank" href="{{ movie.trailer_url }}">{{ movie.trailer_url }}</a></td>
+                                <td>{% for director in movie.directors|data %}
+                                    * {{ director.name }}
+                                {% endfor %}</td>
+                                <td>{% for actor in movie.actors|data %}
+                                    * {{ actor.name }}
+                                {% endfor %}</td>
+                                {% if user.is_authenticated and user.is_staff %}
+                                    <td><a
+                                            href="{% url 'appMovie:editmovie' movie.slug %}"><i
+                                            class="icon-pencil"></i></a>&nbsp;&nbsp;&nbsp;
+                                        <a
+                                                href="{% url 'appMovie:deletemovie' movie.slug %}"><i
+                                                class="icon-trash"></i></a></td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+
             </div>
             <div class="row-fluid">
-                <a class="btn btn-default btn-success" href="{% url 'appMovie:index' %}">REGRESAR</a>
+                <a class="btn btn-default btn-success" href="{% url 'appMovie:index' %}">BACK TO INDEX</a>
             </div>
         </div>
     </section>

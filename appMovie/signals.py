@@ -9,3 +9,4 @@ from .models import Movie
 def create_slug_for_movie(instance, **kwargs):
     instance.slug = slugify(instance.title)
     return instance
+

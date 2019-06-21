@@ -11,23 +11,21 @@
     <section id="services">
         <div class="container">
             <div class="center gap">
-                <h1>Add movie rate</h1>
             </div>
             <div class="row-fluid">
-                <form method="post" action="{% url 'appMovie:addmovierate' %}" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <center>
-                        <div class="wrap-input100 validate-input">
-                            {{ form.as_p }}
-                        </div>
-                        <div class="container-login100-form-btn">
-                            <input class="btn btn-large btn-transparent" style="cursor: pointer;" type="submit"
-                                   value="Guardar">
-                        </div>
-                    </center>
-
-                </form>
-
+                <center>
+                    <div class="wrap-input100 validate-input">
+                        <h1 style="color: red; font-weight: bold;">Movie rate with this User and Movie already
+                            exists.</h1>
+                    </div>
+                    <div class="container-login100-form-btn">
+                        <br>
+                        <br>
+                        <br>
+                        <br>
+                        <a class="btn btn-default btn-success" href="{% url 'appMovie:index' %}">BACK TO INDEX</a>
+                    </div>
+                </center>
             </div>
 
         </div>

@@ -19,7 +19,7 @@
                      data-slice2-rotation="-25" data-slice1-scale="2" data-slice2-scale="2">
                     <div class="sl-slide-inner">
                         <div class="container">
-                            <img class="pull-right" src="{{ best_rated_movie.poster.url }}" alt=""/>
+                            <a href="{% url 'appMovie:movie-detail' best_rated_movie.slug %}"><img class="img-slider" src="{{ best_rated_movie.poster.url }}" alt=""/></a>
                             <h2>{{ best_rated_movie.title }}</h2>
                             <h3 class="gap">BEST RATED</h3>
                             <a class="btn btn-large btn-transparent"
@@ -34,7 +34,7 @@
                      data-slice1-scale="1.5" data-slice2-scale="1.5">
                     <div class="sl-slide-inner">
                         <div class="container">
-                            <img class="pull-right" src="{{ best_rated_movie2.poster.url }}" alt=""/>
+                            <a href="{% url 'appMovie:movie-detail' best_rated_movie2.slug %}"><img class="img-slider" src="{{ best_rated_movie2.poster.url }}" alt=""/></a>
                             <h2>{{ best_rated_movie2.title }}</h2>
                             <h3 class="gap">SECOND BEST RATED</h3>
                             <a class="btn btn-large btn-transparent"
@@ -49,7 +49,7 @@
                      data-slice1-scale="2" data-slice2-scale="1">
                     <div class="sl-slide-inner">
                         <div class="container">
-                            <img class="pull-right" src="{{ best_rated_movie3.poster.url }}" alt=""/>
+                            <a href="{% url 'appMovie:movie-detail' best_rated_movie3.slug %}"><img class="img-slider" src="{{ best_rated_movie3.poster.url }}" alt=""/></a>
                             <h2>{{ best_rated_movie3.title }}</h2>
                             <h3 class="gap">THIRD BEST RATED</h3>
                             <a class="btn btn-large btn-transparent"
@@ -87,80 +87,25 @@
                     {% for movie in movie_list %}
                         <li>
                             <div class="preview">
-                                <img class="img2" alt=" " src="{{ movie.poster.url }}"/>
-                                <div class="overlay"></div>
+                                <a href="{% url 'appMovie:movie-detail' movie.slug %}"><img class="img2" alt=" "
+                                                                                            src="{{ movie.poster.url }}"/></a>
+                                {% if user.is_authenticated and user.is_staff %}
+                                    <div class="overlay"></div>
+                                {% endif %}
                                 <div class="links">
                                     {% if user.is_authenticated and user.is_staff %}
-                                        <a data-toggle="modal" href="#modal-{{ movie.slug }}"><i
-                                                class="icon-eye-open"></i></a>
-                                        <a
-                                                href="{% url 'appMovie:editmovie' movie.slug %}"><i
+                                        <a style="margin-left: 24px;"
+                                           href="{% url 'appMovie:editmovie' movie.slug %}"><i
                                                 class="icon-pencil"></i></a>
                                         <a
                                                 href="{% url 'appMovie:deletemovie' movie.slug %}"><i
                                                 class="icon-trash"></i></a>
-                                    {% else %}
-                                        <a style="margin-left: 50px;" data-toggle="modal"
-                                           href="#modal-{{ movie.slug }}"><i class="icon-eye-open"></i></a>
                                     {% endif %}
                                 </div>
                             </div>
                             <div class="desc">
                                 <a href="{% url 'appMovie:movie-detail' movie.slug %}">{{ movie.title }}</a>
                                 <h5>Release date: {{ movie.release_date }}</h5>
-                            </div>
-                            <div id="modal-{{ movie.slug }}" class="modal hide fade">
-                                <a class="close-modal" href="javascript:;" data-dismiss="modal" aria-hidden="true"><i
-                                        class="icon-remove"></i></a>
-                                <div class="modal-body">
-                                    <h1 style="color: #000;" class="text-center">{{ movie.title }}</h1>
-                                    <center>
-                                        {% if movie.trailer_url == '' %}
-                                            <img width="620" height="345" alt=" " src="{{ movie.poster.url }}"/>
-                                        {% else %}
-                                            <iframe width="620" height="345"
-                                                    src="https://www.youtube.com/embed/{{ movie.trailer_url|url }}">
-                                            </iframe>
-                                        {% endif %}
-                                        <br>
-                                        <br>
-                                        <div class="center gap">
-                                            <table class="table-active" border="2">
-                                                <thead class="boldJ">
-                                                <td>Title</td>
-                                                <td>Genre</td>
-                                                <td>Language</td>
-                                                <td>Country</td>
-                                                <td>Release date</td>
-                                                <td>Duration</td>
-                                                <td>Trailer url</td>
-                                                <td>Directors</td>
-                                                <td>Actors</td>
-                                                </thead>
-                                                <tbody>
-                                                <tr>
-                                                    <td>{{ movie.title }}</td>
-                                                    <td>{{ movie.genre }}</td>
-                                                    <td>{{ movie.original_language }}</td>
-                                                    <td>{{ movie.country }}</td>
-                                                    <td>{{ movie.release_date }}</td>
-                                                    <td>{{ movie.duration }} min</td>
-                                                    <td><a target="_blank"
-                                                           href="{{ movie.trailer_url }}">{{ movie.trailer_url }}</a>
-                                                    </td>
-                                                    <td>{% for director in movie.directors|data %}
-                                                        * {{ director.name }}
-                                                    {% endfor %}</td>
-                                                    <td>{% for actor in movie.actors|data %}
-                                                        * {{ actor.name }}
-                                                    {% endfor %}</td>
-                                                </tr>
-
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </center>
-                                </div>
                             </div>
                         </li>
                     {% endfor %}

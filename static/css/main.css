@@ -556,6 +556,12 @@ header .dropdown-menu:before {
     height: 300px;
 }
 
+.img-slider{
+    width: 600px;
+    height: 520px;
+    float:right;
+}
+
 #bottom ul.thumbnails {
     margin-bottom: 0
 }
