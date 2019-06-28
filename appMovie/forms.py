@@ -73,7 +73,7 @@ class TokenUserForm(forms.ModelForm):
 
 
 class DownloadForm(forms.Form):
-    title = forms.CharField(max_length=150)
+    title = forms.CharField(max_length=200)
 
 
 class SimpleForm(forms.ModelForm):

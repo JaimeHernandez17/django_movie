@@ -1,6 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 import os
 from celery import Celery
+from celery.schedules import crontab
 
 # set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_movie.settings')
@@ -15,6 +16,16 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 
 # Load task modules from all registered Django app configs.
 app.autodiscover_tasks()
+
+app.conf.beat_schedule = {
+    'search_in_db_5_min': {
+        'task': 'appMovie.tasks.search_in_db',
+        'args': (),
+        'schedule': crontab(minute='*/1'),
+
+    },
+}
+app.conf.timezone = 'UTC'
 
 
 @app.task(bind=True)

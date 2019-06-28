@@ -89,3 +89,10 @@ class TokenUser(models.Model):
 
     def __str__(self):
         return self.token
+
+
+class Suggest(models.Model):
+    names_movies = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.names_movies

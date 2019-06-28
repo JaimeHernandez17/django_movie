@@ -18,7 +18,7 @@ from appMovie.api.serializers import MovieSerializer, MovieRateSerializer, Movie
 from appMovie.forms import MovieForm, SimpleForm, MovieRateForm, TokenUserForm, DownloadForm
 from appMovie.models import Movie, MovieRate, TokenUser
 # from appMovie.tasks import download_movies
-from appMovie.tasks import send_email, download_movies
+from appMovie.tasks import send_email, download_movies, save_titles
 from celery import signature, chord, group
 
 
@@ -262,12 +262,9 @@ class DownloadMovieForm(FormView):
 
     def form_valid(self, form):
         title = str(self.request.POST['title']).split(',')
-        task_group = []
         for i in range(len(title)):
             if title[i][0] == ' ':
                 title[i] = title[i][1:]
-            task_group.append(download_movies.s(title[i]))
-
-        chord(group(task_group), send_email.s()).delay()
+            save_titles.s(title[i])()
 
         return super(DownloadMovieForm, self).form_valid(form)

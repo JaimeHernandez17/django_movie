@@ -10,4 +10,5 @@ admin.site.register(MovieRate)
 admin.site.register(MovieActor)
 admin.site.register(MovieDirector)
 admin.site.register(TokenUser)
+admin.site.register(Suggest)
 
