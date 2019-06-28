@@ -1,0 +1,37 @@
+{% extends 'base/base.html' %}
+
+{% load static %}
+
+{% block title %}Downloaded{% endblock %}
+
+<body>
+
+{% block services %}
+
+    <!--Services-->
+    <section id="services">
+        <div class="container">
+            <div class="center gap">
+                <h1>Downloaded movies!</h1>
+                <h1>Watch your email</h1>
+            </div>
+            <center>
+                <div class="row-fluid">
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <a class="btn btn-default btn-success" href="{% url 'appMovie:index' %}">BACK TO INDEX</a>
+                    <a class="btn btn-default btn-success" href="{% url 'appMovie:download' %}">DOWNLOAD OTHER MOVIE</a>
+                </div>
+            </center>
+
+        </div>
+    </section>
+    <!--/Services-->
+
+{% endblock %}
+
+
+</body>

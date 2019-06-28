@@ -1,3 +1,5 @@
+import time
+
 import django_filters
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
@@ -10,19 +12,18 @@ from rest_framework.generics import ListAPIView, RetrieveAPIView, ListCreateAPIV
 from rest_framework.renderers import JSONRenderer
 from rest_framework.authtoken.models import Token
 
-from appMovie.api.filters import MovieFilterset
+from appMovie.api.filters import MovieFilterset, MovieFilterForView
 from appMovie.api.serializers import MovieSerializer, MovieRateSerializer, MovieModelSerializer
 
-from appMovie.forms import MovieForm, SimpleForm, MovieRateForm, TokenUserForm
+from appMovie.forms import MovieForm, SimpleForm, MovieRateForm, TokenUserForm, DownloadForm
 from appMovie.models import Movie, MovieRate, TokenUser
+# from appMovie.tasks import download_movies
+from appMovie.tasks import send_email, download_movies
+from celery import signature, chord, group
 
 
 def movieAdded(request):
     return render(request, 'success/successmovie.html')
-
-
-def movieDeleted(request):
-    return render(request, 'success/successdeletemovie.html')
 
 
 def movieEdited(request):
@@ -31,6 +32,10 @@ def movieEdited(request):
 
 def movieRated(request):
     return render(request, 'success/successmovierate.html')
+
+
+def movieDownload(request):
+    return render(request, 'success/moviedownloaded.html')
 
 
 class SerializerExampleList(ListView):
@@ -130,11 +135,19 @@ class ListMoviesView(ListView):
     paginate_by = 20
 
 
+def search(request):
+    movie_list = Movie.objects.all()
+    movie_filter = MovieFilterForView(data=None, queryset=movie_list, request=request.GET, prefix=None)
+    print(movie_filter.data.get('query'))
+    return render(request, 'listmovie.html', {'filter': movie_filter})
+
+
 class SearchMoviesView(ListView):
     template_name = 'listmovie.html'
     queryset = Movie.objects.all()
-    #filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
-    #filterset_class = MovieFilterset
+
+    # filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    # filterset_class = MovieFilterset
 
     def get(self, request, *args, **kwargs):
         if self.request.GET.get('query') != None:
@@ -144,25 +157,25 @@ class SearchMoviesView(ListView):
         qs = super(SearchMoviesView, self).get_queryset()
         return qs.order_by('-id')
 
-    # def searchMovie(self, request):
-    #     busqueda = self.request.GET.get('query')
-    #     busqueda = str(busqueda).lower()
-    #     num = 0
-    #     try:
-    #         num = int(busqueda)
-    #     except:
-    #         pass
-    #     try:
-    #         if busqueda == None or busqueda == "":
-    #             movie = None
-    #             contex = {'movies': movie}
-    #         elif Movie.objects.filter(title__icontains=busqueda):
-    #             movie = Movie.objects.filter(title__icontains=busqueda)
-    #             contex = {'movies': movie}
-    #         return render(request, 'listmovie.html', contex)
-    #     except Exception:
-    #         contex = {'movies': 'no se encontraron coincidencias'}
-    #         return render(request, 'listmovie.html', contex)
+    def searchMovie(self, request):
+        busqueda = self.request.GET.get('query')
+        busqueda = str(busqueda).lower()
+        num = 0
+        try:
+            num = int(busqueda)
+        except:
+            pass
+        try:
+            if busqueda == None or busqueda == "":
+                movie = None
+                contex = {'movies': movie}
+            elif Movie.objects.filter(title__icontains=busqueda):
+                movie = Movie.objects.filter(title__icontains=busqueda)
+                contex = {'movies': movie}
+            return render(request, 'listmovie.html', contex)
+        except Exception:
+            contex = {'movies': 'no se encontraron coincidencias'}
+            return render(request, 'listmovie.html', contex)
 
 
 class HomeView(ListView):
@@ -240,3 +253,21 @@ class MovieFormExample(FormView):
     def form_invalid(self, form):
         print(form.errors)
         return super(MovieFormExample, self).form_invalid(form)
+
+
+class DownloadMovieForm(FormView):
+    template_name = 'CRUD/downloadform.html'
+    form_class = DownloadForm
+    success_url = reverse_lazy('appMovie:moviedownloaded')
+
+    def form_valid(self, form):
+        title = str(self.request.POST['title']).split(',')
+        task_group = []
+        for i in range(len(title)):
+            if title[i][0] == ' ':
+                title[i] = title[i][1:]
+            task_group.append(download_movies.s(title[i]))
+
+        chord(group(task_group), send_email.s()).delay()
+
+        return super(DownloadMovieForm, self).form_valid(form)

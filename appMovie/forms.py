@@ -72,6 +72,10 @@ class TokenUserForm(forms.ModelForm):
         )
 
 
+class DownloadForm(forms.Form):
+    title = forms.CharField(max_length=150)
+
+
 class SimpleForm(forms.ModelForm):
     class Meta:
         model = MovieRate

@@ -1,0 +1,44 @@
+{% extends 'base/base.html' %}
+
+{% load static %}
+
+{% block title %}Download{% endblock %}
+
+<body>
+
+{% block services %}
+
+    <!--Services-->
+    <section id="services">
+        <div class="container">
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="-pull-left">
+                            {{ form.as_p }}
+                        </div>
+                        <div class="container-login100-form-btn">
+                            <input class="login100-form-btn" style="cursor: pointer;" type="submit"
+                                   value="Download">
+                        </div>
+                </form>
+
+            <center>
+                <div class="row-fluid">
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <a class="btn btn-default btn-success" href="{% url 'appMovie:index' %}">BACK TO INDEX</a>
+                </div>
+            </center>
+
+        </div>
+    </section>
+    <!--/Services-->
+
+{% endblock %}
+
+
+</body>

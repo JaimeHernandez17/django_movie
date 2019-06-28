@@ -34,7 +34,11 @@ class Command(BaseCommand):
             response = requests.get('http://www.omdbapi.com/?i=' + i + '&plot=full&apikey=9f9a1efb')
             movies.append(response.json())
 
+        titles = ''
+
         for i in movies:
+            print(i['Title'])
+            titles += (i['Title'])+','
             poster = i['Poster']
             if poster == "N/A":
                 poster = 'https://caiv.org/wp-content/plugins/smg-theme-tools/public/images/not-available-es.png'
@@ -78,7 +82,7 @@ class Command(BaseCommand):
                 poster = 'not-available-es.png'
             else:
                 poster = '{}.{}'.format(i['Title'], poster.split('.')[-1])
-            print(poster)
+            # print(poster)
             instance_movie, _ = Movie.objects.update_or_create(title=m_title, defaults={
                 'title': m_title, 'duration': duration, 'release_date': release_date, 'detail': detail,
                 'country': country[0],
@@ -88,5 +92,4 @@ class Command(BaseCommand):
             for k in v_directors:
                 instance_movie.directors.add(MovieDirector.objects.get(name=k))
 
-        print(search)
-        print(title)
+        return titles
