@@ -10,6 +10,9 @@ from appMovie.queryset import MovieQuerySet, MovieRateQueryset
 
 
 class Movie(models.Model):
+    """
+        This class describes the model with all the attributes for the movies.
+    """
     title = models.CharField(max_length=200)
     duration = models.IntegerField()
     release_date = models.DateField()
@@ -53,6 +56,9 @@ class Country(models.Model):
 
 
 class MovieRate(models.Model):
+    """
+        This class describes the model with all the attributes for the rates of the movies.
+    """
     movie = models.ForeignKey(Movie, null=True, blank=True, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
     rate = models.FloatField(validators=[MinValueValidator(1), MaxValueValidator(5)])
@@ -64,6 +70,11 @@ class MovieRate(models.Model):
         unique_together = ('user', 'movie')
 
     def __str__(self):
+        """
+
+        Returns: The name of the user who rated the movie and the name of the movie that was rated.
+
+        """
         return "{} - {}".format(self.user.username, self.movie.title)
 
 

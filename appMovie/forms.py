@@ -54,13 +54,14 @@ class MovieRateForm(forms.ModelForm):
         model = MovieRate
 
         fields = {
-            'user', 'rate', 'movie'
+            'user', 'rate', 'movie', 'comment',
         }
 
         labels = {
             'user': 'User',
             'rate': 'Rate',
             'movie': 'Movie',
+            'comment': 'Comment',
         }
 
 
